@@ -1,5 +1,12 @@
 # mayohr-auto-punch
 
+[![npm version](https://img.shields.io/npm/v/mayohr-auto-punch.svg)](https://www.npmjs.com/package/mayohr-auto-punch)
+[![npm downloads](https://img.shields.io/npm/dm/mayohr-auto-punch.svg)](https://www.npmjs.com/package/mayohr-auto-punch)
+[![Docker Pulls](https://img.shields.io/docker/pulls/justintw/mayohr-auto-punch.svg)](https://hub.docker.com/r/justintw/mayohr-auto-punch)
+[![Docker Image Size](https://img.shields.io/docker/image-size/justintw/mayohr-auto-punch)](https://hub.docker.com/r/justintw/mayohr-auto-punch)
+[![Docker Stars](https://img.shields.io/docker/stars/justintw/mayohr-auto-punch.svg)](https://hub.docker.com/r/justintw/mayohr-auto-punch)
+
+
 An automated solution for handling punch in/out operations in MayoHR system. This tool helps streamline your daily attendance tracking by automating the punch process.
 
 
@@ -9,7 +16,7 @@ An automated solution for handling punch in/out operations in MayoHR system. Thi
 
 ## Quick Start
 
-### 1. Environment Setup
+### Environment Setup
 
 First, create and configure your environment file:
 
@@ -45,7 +52,9 @@ TELEGRAM_CHAT_ID="chat_id"         # Your Telegram chat ID
 
 > Note: For MS_TOPT_SECRET, you'll need to extract the TOTP secret from your Microsoft Authenticator QR code. This is typically in the format of "otpauth://...".
 
-### 2. Basic Usage
+## Usage Options
+
+### Option 1: Command Line Interface
 
 Run the script directly using npx:
 
@@ -59,6 +68,59 @@ Run the script directly using docker:
 docker run --rm -it \
   -v $HOME/.mayohr-auto-punch:/home/pptruser/.mayohr-auto-punch \
   justintw/mayohr-auto-punch:latest
+```
+
+### Option 2: Programmatic Usage with Node.js
+
+You can also use the package programmatically in your Node.js applications:
+
+1. Install the package:
+
+```bash
+npm install mayohr-auto-punch -S
+```
+
+2. Use in your code:
+
+```javascript
+import { MayohrService } from 'mayohr-auto-punch';
+
+async function main() {
+  // Create MayohrService instance
+  const mayohrService = new MayohrService(
+    true, // headless mode
+    'your-domain.com',
+    'your-username@your-domain.com',
+    'your-password',
+    'your-totp-secret'
+  );
+
+  try {
+    // Initialize browser
+    await mayohrService.init();
+
+    // Login
+    const isLoggedIn = await mayohrService.login();
+    if (!isLoggedIn) {
+      throw new Error('Login failed');
+    }
+
+    // Punch
+    const isPunched = await mayohrService.punch();
+    if (!isPunched) {
+      throw new Error('Punch failed');
+    } else {
+      console.log('Punch successful');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  } finally {
+    // Close browser
+    await mayohrService.close();
+  }
+}
+
+main();
 ```
 
 ## Deployment Options
